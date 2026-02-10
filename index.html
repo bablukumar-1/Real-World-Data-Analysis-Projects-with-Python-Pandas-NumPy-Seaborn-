@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Translator</title>
+</head>
+<body>
+
+<h2>Voice Language Translator</h2>
+
+<textarea id="text" rows="4" cols="40"
+  placeholder="Speak or type..."></textarea><br><br>
+
+<!-- 🎤 VOICE INPUT LANGUAGE -->
+<label>Voice Input Language:</label>
+<select id="voiceLang">
+  <!-- Existing -->
+  <option value="en-US">English</option>
+  <option value="hi-IN">Hindi</option>
+  <option value="bn-IN">Bengali</option>
+  <option value="ta-IN">Tamil</option>
+  <option value="te-IN">Telugu</option>
+  <option value="mr-IN">Marathi</option>
+
+  <!-- 🔥 10 MORE LANGUAGES -->
+  <option value="gu-IN">Gujarati</option>
+  <option value="kn-IN">Kannada</option>
+  <option value="ml-IN">Malayalam</option>
+  <option value="pa-IN">Punjabi</option>
+  <option value="ur-PK">Urdu</option>
+  <option value="or-IN">Odia</option>
+  <option value="as-IN">Assamese</option>
+  <option value="ne-NP">Nepali</option>
+  <option value="fr-FR">French</option>
+  <option value="de-DE">German</option>
+</select>
+
+<button type="button" onclick="startVoice()">🎤 Speak</button><br><br>
+
+<!-- 🌍 TRANSLATION LANGUAGE -->
+<label>Translate To:</label>
+<select id="lang">
+  <option value="hi">Hindi</option>
+  <option value="en">English</option>
+  <option value="bn">Bengali</option>
+  <option value="fr">French</option>
+  <option value="de">German</option>
+</select><br><br>
+
+<button type="button" onclick="translateText()">Translate</button>
+
+<h3>Result:</h3>
+<p id="result"></p>
+
+<script>
+/* 🎤 VOICE TO TEXT (MULTI LANGUAGE) */
+function startVoice() {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  const recognition = new SpeechRecognition();
+
+  const voiceLang =
+    document.getElementById("voiceLang").value;
+
+  recognition.lang = voiceLang;
+  recognition.start();
+
+  recognition.onresult = function(event) {
+    document.getElementById("text").value =
+      event.results[0][0].transcript;
+  };
+}
+
+/* 🌍 TEXT TO TRANSLATION */
+async function translateText() {
+  const text = document.getElementById("text").value;
+  const lang = document.getElementById("lang").value;
+
+  const res = await fetch("http://127.0.0.1:5000/translate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, target: lang })
+  });
+
+  const data = await res.json();
+  document.getElementById("result").innerText =
+    data.translated_text;
+}
+</script>
+
+</body>
+</html>
